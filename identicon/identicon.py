@@ -39,7 +39,9 @@ class PngImageGen:
   def pixelAt(self, row, col):
     if self.auth and row == 0 and col <= 15:
       # SECRET EMBEDDED in the first 16 bytes of the first row
-      return (240, 240, 240, self.secret[col])
+      return (self.secret[col], 240, 240, 0)
+    if row == 0 or col == 0 or row == self.true_width - 1 or col == self.true_width - 1:
+      return (240,240,240,255)
     if (row < self.padding) or (row >= self.padding + self.height) or \
             (col < self.padding) or (col >= self.padding + self.width):
       return self.GRAY_COLOR
@@ -92,7 +94,7 @@ def verify(name, bytes):
   #return buffer.getvalue() == bytes
   (_,_,s,_) = reader.asDirect()
   s = s.next()
-  ex = [s[x * 4 + 3] for x in xrange(0,16)]
+  ex = [s[x * 4] for x in xrange(0,16)]
   print sec
   print ex
   return ex == sec
