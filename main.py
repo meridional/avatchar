@@ -45,7 +45,7 @@ class RegisterHandler(tornado.web.RequestHandler):
     else:
       confirm_login(self, name)
       user = acdb.insert_user(name)
-      self.render("register_successful.html", user = user)
+      self.render("./static/register_successful.html", user = user)
 
 
 
@@ -55,9 +55,9 @@ class MainHandler(tornado.web.RequestHandler):
     if not verify_login(self):
       #self.set_cookie(name_cookie_key, "harry")
       #self.set_secure_cookie(id_cookie_key, "harry")
-      self.render("register.html")
+      self.render("./static/register.html")
     else:
-      self.render("register.html")
+      self.render("./static/chat.html")
 
 
 class IdenticonHandler(tornado.web.RequestHandler):
@@ -112,8 +112,8 @@ application = tornado.web.Application([
   (r'/identicon/(.*)/?', IdenticonHandler),
   (r'/secret/(.*)/?', SecretHandler),
   (r'/login/?', VerificationHandler),
-  (r'/register/?', RegisterHandler)
-  (r'/(.*)', tornado.web.StaticFileHandler, {"path":"."})
+  (r'/register/?', RegisterHandler),
+  (r'/(.*)', tornado.web.StaticFileHandler, {"path":"./static/"})
 ])
 
 application.settings['cookie_secret'] = \
