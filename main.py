@@ -66,7 +66,9 @@ application.settings['cookie_secret'] = \
     "afe96cbb5b5c05bb5514490c2f44f3297a925acca8548b330b2125a745dd4cf8"
 
 
-define("name", default=8888, help="run on given port", type=int)
+define("port", default=8888, help="run on given port", type=int)
+
+
 
 if __name__ == "__main__":
     application.listen(tornado.options.options.port)
