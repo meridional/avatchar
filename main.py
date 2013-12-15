@@ -82,29 +82,45 @@ class VerificationHandler(tornado.web.RequestHandler):
     self.write('fail')
 
 
-current_user = {}
+current_user_conn = {}
+current_user_dict = {}
+
+def broadcast(content):
+  for conn in current_user_conn:
+    conn.write_message(content)
 
 class RealTimeRocker(tornado.websocket.WebSocketHandler):
 
   def open(self):
     u = verify_login(self)
     if u:
-      current_user[self] = u
+      current_user_conn[self] = u
+      if current_user_dict.has_key(u):
+        current_user_dict[u] += 1
+      else:
+        current_user_dict[u] = 1
+        broadcast({"user_joined":encode_user(u)})
       return
+    print 'fail'
     self.close()
+
 
   def on_message(self, message):
     #print type(message)
-
-    msg = acdb.user_said_something(current_user[self], message)
+    msg = acdb.user_said_something(current_user_conn[self], message)
     # broadcast
-    for conn in current_user:
-      conn.write_message({"data":[encode_msg(msg)]})
-
+    broadcast({"data":[encode_msg(msg)]})
 
   def on_close(self):
-    if current_user.has_key(self):
-      del current_user[self]
+    if current_user_conn.has_key(self):
+      current_user = current_user_conn[self]
+      if current_user_dict[current_user] == 1:
+        del current_user_dict[current_user]
+        broadcast({"user_left":encode_user(current_user)})
+      else:
+        current_user_dict[current_user] -= 1
+      del current_user_conn[self]
+
 
 class SecretHandler(tornado.web.RequestHandler):
   def get(self, name):
@@ -126,13 +142,26 @@ def encode_msg(msg):
   return {
          "name":msg.user.name,
          "img":"/identicon/" + msg.user.name,
-         "msg":msg.content,
+         "msg":msg.text,
          "datetime":str(msg.datetime)}
+
+
+def encode_user(user):
+  return {
+    "name":user.name,
+    "img":"/identicon/" + user.name
+   }
+
 
 class HistHandler(tornado.web.RequestHandler):
   def get(self, *args, **kwargs):
     msgs = acdb.get_recent_messages()
     self.write({"data":map(encode_msg, msgs)})
+
+
+class CurrentUserHandler(tornado.web.RequestHandler):
+  def get(self, *args, **kwargs):
+    self.write({"users":map(encode_user, current_user_dict)})
 
 
 # routes
@@ -143,6 +172,7 @@ application = tornado.web.Application([
   (r'/secret/(.*)/?', SecretHandler),
   (r'/login/?', VerificationHandler),
   (r'/hist/?', HistHandler),
+  (r'/current/?', CurrentUserHandler),
   (r'/register/?', RegisterHandler),
   (r'/(.*)', tornado.web.StaticFileHandler, {"path":"./static/"})
 ])

@@ -31,6 +31,12 @@ class User:
     self.idx = idx
     self.img_url = img_url
 
+  def __eq__(self, other):
+    return self.idx == other.idx
+
+  def __hash__(self):
+    return self.idx.__hash__()
+
   def getAvatar(self):
     return self.img_url
 
