@@ -54,9 +54,10 @@ class RealTimeRocker(tornado.websocket.WebSocketHandler):
         self.write_message(message + u", hello")
 
 
+# routes
 application = tornado.web.Application([
   (r"/json/(.*)", MainHandler),
-  (r"/ws/.*", RealTimeRocker),
+  (r"/rush/.*", RealTimeRocker),
   (r'/identicon/(.*)', IdenticonHandler),
   (r'/upload', VerificationHandler),
   (r'/(.*)', tornado.web.StaticFileHandler, {"path":"."})
@@ -67,7 +68,7 @@ application.settings['cookie_secret'] = \
 
 
 define("port", default=8888, help="run on given port", type=int)
-
+define("mongourl", default='mongodb://localhost:27017/')
 
 
 if __name__ == "__main__":
