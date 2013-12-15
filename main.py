@@ -99,7 +99,7 @@ class RealTimeRocker(tornado.websocket.WebSocketHandler):
     msg = acdb.user_said_something(current_user[self], message)
     # broadcast
     for conn in current_user:
-      conn.write_message(encode_msg(msg))
+      conn.write_message({"data":[encode_msg(msg)]})
 
 
   def on_close(self):
@@ -132,7 +132,7 @@ def encode_msg(msg):
 class HistHandler(tornado.web.RequestHandler):
   def get(self, *args, **kwargs):
     msgs = acdb.get_recent_messages()
-    self.write(map(encode_msg, msgs))
+    self.write({"data":map(encode_msg, msgs)})
 
 
 # routes
