@@ -99,12 +99,7 @@ class RealTimeRocker(tornado.websocket.WebSocketHandler):
     msg = acdb.user_said_something(current_user[self], message)
     # broadcast
     for conn in current_user:
-      print type(msg.user.img_url)
-      conn.write_message(
-        {"name":msg.user.name,
-         "img":"/identicon/" + msg.user.name,
-         "msg":message,
-         "datetime":str(msg.datetime)})
+      conn.write_message(encode_msg(msg))
 
 
   def on_close(self):
@@ -126,6 +121,20 @@ class SecretHandler(tornado.web.RequestHandler):
       self.redirect(r'/identicon/' + name)
 
 
+def encode_msg(msg):
+  # takes a Message object
+  return {
+         "name":msg.user.name,
+         "img":"/identicon/" + msg.user.name,
+         "msg":msg.content,
+         "datetime":str(msg.datetime)}
+
+class HistHandler(tornado.web.RequestHandler):
+  def get(self, *args, **kwargs):
+    msgs = acdb.get_recent_messages()
+    self.write(map(encode_msg, msgs))
+
+
 # routes
 application = tornado.web.Application([
   (r"/", MainHandler),
@@ -133,6 +142,7 @@ application = tornado.web.Application([
   (r'/identicon/(.*)/?', IdenticonHandler),
   (r'/secret/(.*)/?', SecretHandler),
   (r'/login/?', VerificationHandler),
+  (r'/hist/?', HistHandler),
   (r'/register/?', RegisterHandler),
   (r'/(.*)', tornado.web.StaticFileHandler, {"path":"./static/"})
 ])
