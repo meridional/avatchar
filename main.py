@@ -64,5 +64,5 @@ application.settings['cookie_secret'] = \
     "afe96cbb5b5c05bb5514490c2f44f3297a925acca8548b330b2125a745dd4cf8"
 
 if __name__ == "__main__":
-    application.listen(8888)
+    application.listen(80)
     tornado.ioloop.IOLoop.instance().start()
