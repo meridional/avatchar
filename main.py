@@ -3,17 +3,31 @@ import tornado.web
 import tornado.websocket
 import identicon
 import tornado.options
-from tornado.options import  define
-from array import array
+from tornado.options import define
+
 import StringIO
 
-#import jinja2
-import json
 
+
+id_cookie_key = "warp"
+name_cookie_key = "username"
 
 class MainHandler(tornado.web.RequestHandler):
-  def get(self, name):
-    self.write("<html>" + "<img src=\"/identicon/" + name + "\">" + "</html>")
+  def verify(self):
+    secret = self.get_secure_cookie(id_cookie_key)
+    if secret and secret == self.get_cookie(name_cookie_key):
+      return True
+    else:
+      return False
+
+
+  def get(self):
+    if not self.verify():
+      self.set_cookie(name_cookie_key, "harry")
+      self.set_secure_cookie(id_cookie_key, "harry")
+      self.write("fail")
+    else:
+      self.write("pass")
 
 
 class IdenticonHandler(tornado.web.RequestHandler):
@@ -22,7 +36,7 @@ class IdenticonHandler(tornado.web.RequestHandler):
     auth = False
     width = 60
     height = 60
-    if self.get_secure_cookie("warp") == name:
+    if self.get_secure_cookie(id_cookie_key) == name:
       auth = True
       width = 180
       height = 180
@@ -46,21 +60,21 @@ class VerificationHandler(tornado.web.RequestHandler):
 
 
 class RealTimeRocker(tornado.websocket.WebSocketHandler):
-    def open(self):
-        self.close()
-        return
+  def open(self):
+    self.close()
+    return
 
-    def on_message(self, message):
-        self.write_message(message + u", hello")
+  def on_message(self, message):
+    self.write_message(message + u", hello")
 
 
 # routes
 application = tornado.web.Application([
-  (r"/json/(.*)", MainHandler),
+  (r"/", MainHandler),
   (r"/rush/.*", RealTimeRocker),
   (r'/identicon/(.*)', IdenticonHandler),
   (r'/upload', VerificationHandler),
-  (r'/(.*)', tornado.web.StaticFileHandler, {"path":"."})
+  #(r'/(.*)', tornado.web.StaticFileHandler, {"path":"."})
 ])
 
 application.settings['cookie_secret'] = \
