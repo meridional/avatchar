@@ -8,26 +8,33 @@ from tornado.options import define
 import StringIO
 
 
-
 id_cookie_key = "warp"
 name_cookie_key = "username"
 
-class MainHandler(tornado.web.RequestHandler):
-  def verify(self):
-    secret = self.get_secure_cookie(id_cookie_key)
-    if secret and secret == self.get_cookie(name_cookie_key):
-      return True
-    else:
-      return False
 
+def verify_login(handler):
+  name = handler.get_cookie(name_cookie_key)
+  if name:
+    #FIXME: db lookup
+    1
+  else:
+    return False
+  secret = handler.get_secure_cookie(id_cookie_key)
+  if secret and secret == name:
+    return True
+  else:
+    return False
+
+
+class MainHandler(tornado.web.RequestHandler):
 
   def get(self):
-    if not self.verify():
-      self.set_cookie(name_cookie_key, "harry")
-      self.set_secure_cookie(id_cookie_key, "harry")
-      self.write("fail")
+    if not verify_login(self):
+      #self.set_cookie(name_cookie_key, "harry")
+      #self.set_secure_cookie(id_cookie_key, "harry")
+      self.render("register.html")
     else:
-      self.write("pass")
+      self.render("register.html")
 
 
 class IdenticonHandler(tornado.web.RequestHandler):

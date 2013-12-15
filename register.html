@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>Avatchat - Welcome!</title>
 </head>
 <body>
-
+    <h1>Register and get your unique identicon to login!</h1>
+    <form action="/register" method="post">
+        <label>user name: <input name="name" type="text"></label>
+        <br/>
+        <label><input type="button" value="Go!"></label>
+    </form>
+    <h1>Already registered? Use your identicon to login!</h1>
+    <form enctype="multipart/form-data" action="login" method="post">
+        <label>user name: <input name="name" type="text"></label>
+        <br/>
+        <label>identicon: <input name="identicon" type="file"></label>
+        <br/>
+        <label><input type="button" value="GO!"></label>
+    </form>
 </body>
 </html>
