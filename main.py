@@ -4,7 +4,7 @@ import tornado.websocket
 import identicon
 import tornado.options
 from tornado.options import define
-
+import acdb
 import StringIO
 
 
@@ -68,8 +68,9 @@ class VerificationHandler(tornado.web.RequestHandler):
 
 class RealTimeRocker(tornado.websocket.WebSocketHandler):
   def open(self):
+    if verify_login(self):
+      return
     self.close()
-    return
 
   def on_message(self, message):
     self.write_message(message + u", hello")
@@ -94,5 +95,6 @@ define("mongourl", default='mongodb://localhost:27017/')
 
 if __name__ == "__main__":
   tornado.options.parse_command_line()
+  acdb.init_db(tornado.options.options.mongourl)
   application.listen(tornado.options.options.port)
   tornado.ioloop.IOLoop.instance().start()
