@@ -2,6 +2,8 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import identicon
+import tornado.options
+from tornado.options import  define
 from array import array
 import StringIO
 
@@ -63,6 +65,9 @@ application = tornado.web.Application([
 application.settings['cookie_secret'] = \
     "afe96cbb5b5c05bb5514490c2f44f3297a925acca8548b330b2125a745dd4cf8"
 
+
+define("name", default=8888, help="run on given port", type=int)
+
 if __name__ == "__main__":
-    application.listen(8000)
+    application.listen(tornado.options.options.port)
     tornado.ioloop.IOLoop.instance().start()
