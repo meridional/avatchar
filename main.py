@@ -71,5 +71,6 @@ define("port", default=8888, help="run on given port", type=int)
 
 
 if __name__ == "__main__":
-    application.listen(tornado.options.options.port)
-    tornado.ioloop.IOLoop.instance().start()
+  tornado.options.parse_command_line()
+  application.listen(tornado.options.options.port)
+  tornado.ioloop.IOLoop.instance().start()
