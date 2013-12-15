@@ -14,16 +14,39 @@ name_cookie_key = "username"
 
 def verify_login(handler):
   name = handler.get_cookie(name_cookie_key)
+  user = acdb.find_user(name)
   if name:
-    #FIXME: db lookup
-    1
+    if not user:
+      return False
   else:
     return False
   secret = handler.get_secure_cookie(id_cookie_key)
   if secret and secret == name:
-    return True
+    return user
   else:
     return False
+
+
+def confirm_login(handler, name):
+  self=handler
+  self.set_cookie(name_cookie_key, name)
+  self.set_secure_cookie(id_cookie_key, name)
+
+
+class RegisterHandler(tornado.web.RequestHandler):
+  def post(self):
+    if verify_login(self):
+      self.redirect("/")
+      print "success"
+      return
+    name = self.request.arguments["name"][0]
+    if acdb.find_user(name):
+      self.redirect("/")
+    else:
+      confirm_login(self, name)
+      user = acdb.insert_user(name)
+      self.render("register_successful.html", user = user)
+
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -39,31 +62,21 @@ class MainHandler(tornado.web.RequestHandler):
 
 class IdenticonHandler(tornado.web.RequestHandler):
   def get(self, name):
-    buffer = StringIO.StringIO()
-    auth = False
-    width = 60
-    height = 60
-    if self.get_secure_cookie(id_cookie_key) == name:
-      auth = True
-      width = 180
-      height = 180
 
-    identicon.genIdenticonFromStringIntoFile(buffer, name, auth, width, height)
     #buffer.close()
     #self.clear()
-    self.write(buffer.getvalue())
+    self.write(acdb.get_identicon_for_user_name(name, auth=False).read(9999))
     self.set_header('Content-Type', 'image/png')
     #self.finish()
 
 
 class VerificationHandler(tornado.web.RequestHandler):
   def post(self, *args, **kwargs):
-    file1 = self.request.files['file1'][0]
+    file1 = self.request.files['identicon'][0]
     name = self.request.arguments["name"][0]
-    if identicon.verify(name, file1["body"]):
-      self.write("Pass")
-    else:
-      self.write("Fail")
+    if acdb.find_user(name) and identicon.verify(name, file1["body"]):
+      confirm_login(self, name)
+    self.redirect("/")
 
 
 class RealTimeRocker(tornado.websocket.WebSocketHandler):
@@ -76,12 +89,27 @@ class RealTimeRocker(tornado.websocket.WebSocketHandler):
     self.write_message(message + u", hello")
 
 
+class SecretHandler(tornado.web.RequestHandler):
+  def get(self, name):
+    u = verify_login(self)
+    print u.name
+    print u.secret_url
+    if u and u.name == name:
+      f = acdb.get_identicon_for_user_name(name, auth=True)
+      self.write(f.read(9999))
+      self.set_header('Content-Type', 'image/png')
+    else:
+      self.redirect(r'/identicon/' + name)
+
+
 # routes
 application = tornado.web.Application([
   (r"/", MainHandler),
   (r"/rush/.*", RealTimeRocker),
   (r'/identicon/(.*)', IdenticonHandler),
-  (r'/upload', VerificationHandler),
+  (r'/secret/(.*)', SecretHandler),
+  (r'/login', VerificationHandler),
+  (r'/register', RegisterHandler)
   #(r'/(.*)', tornado.web.StaticFileHandler, {"path":"."})
 ])
 

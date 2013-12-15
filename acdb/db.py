@@ -74,6 +74,13 @@ def insert_user(name):
   return User(idx, name, sf._id, pf._id)
 
 
+def get_identicon_for_user_name(name, auth = False):
+  u = find_user(name)
+  if auth:
+    return secret_file_sys.get(u.secret_url)
+  return public_file_sys.get(u.img_url)
+
+
 def find_user(name):
   record = user_collection.find_one({"name" : name})
   if record:

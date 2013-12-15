@@ -41,7 +41,7 @@ class PngImageGen:
       # SECRET EMBEDDED in the first 16 bytes of the first row
       return (self.secret[col], 240, 240, 0)
     if row == 0 or col == 0 or row == self.true_width - 1 or col == self.true_width - 1:
-      return (240,240,240,255)
+      return (240,240,240,0)
     if (row < self.padding) or (row >= self.padding + self.height) or \
             (col < self.padding) or (col >= self.padding + self.width):
       return self.GRAY_COLOR

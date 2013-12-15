@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Success!</title>
+</head>
+<body>
+    {% block user %}
+    <h1>Welcome, {{escape(user.name)}}</h1>
+    <p>Save this image for future login!</p>
+    <img src="/secret/"{{ user.secret_url }}/>
+    <a href="/">Click me to chat!</a>
+    {% endb %}
+</body>
+</html>
