@@ -62,7 +62,8 @@ class MainHandler(tornado.web.RequestHandler):
 
 class IdenticonHandler(tornado.web.RequestHandler):
   def get(self, name):
-
+    if name[-1] == '/':
+      name = name[0:-1]
     #buffer.close()
     #self.clear()
     self.write(acdb.get_identicon_for_user_name(name, auth=False).read(9999))
@@ -75,8 +76,9 @@ class VerificationHandler(tornado.web.RequestHandler):
     file1 = self.request.files['identicon'][0]
     name = self.request.arguments["name"][0]
     if acdb.find_user(name) and identicon.verify(name, file1["body"]):
+      self.write('success')
       confirm_login(self, name)
-    self.redirect("/")
+    self.write('fail')
 
 
 class RealTimeRocker(tornado.websocket.WebSocketHandler):
@@ -88,9 +90,10 @@ class RealTimeRocker(tornado.websocket.WebSocketHandler):
   def on_message(self, message):
     self.write_message(message + u", hello")
 
-
 class SecretHandler(tornado.web.RequestHandler):
   def get(self, name):
+    if name[-1] == '/':
+      name = name[0:-1]
     u = verify_login(self)
     print u.name
     print u.secret_url
@@ -105,12 +108,12 @@ class SecretHandler(tornado.web.RequestHandler):
 # routes
 application = tornado.web.Application([
   (r"/", MainHandler),
-  (r"/rush/.*", RealTimeRocker),
-  (r'/identicon/(.*)', IdenticonHandler),
-  (r'/secret/(.*)', SecretHandler),
-  (r'/login', VerificationHandler),
-  (r'/register', RegisterHandler)
-  #(r'/(.*)', tornado.web.StaticFileHandler, {"path":"."})
+  (r"/rush/.*/?", RealTimeRocker),
+  (r'/identicon/(.*)/?', IdenticonHandler),
+  (r'/secret/(.*)/?', SecretHandler),
+  (r'/login/?', VerificationHandler),
+  (r'/register/?', RegisterHandler)
+  (r'/(.*)', tornado.web.StaticFileHandler, {"path":"."})
 ])
 
 application.settings['cookie_secret'] = \

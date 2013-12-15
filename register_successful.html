@@ -7,8 +7,8 @@
     {% block user %}
     <h1>Welcome, {{escape(user.name)}}</h1>
     <p>Save this image for future login!</p>
-    <img src="/secret/"{{ user.secret_url }}/>
+    <img src= {{  "/secret/" + user.name }}/>
     <a href="/">Click me to chat!</a>
-    {% endb %}
+    {% end %}
 </body>
 </html>

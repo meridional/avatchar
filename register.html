@@ -8,15 +8,15 @@
     <form action="/register" method="post">
         <label>user name: <input name="name" type="text"></label>
         <br/>
-        <label><input type="button" value="Go!"></label>
+        <label><input type="submit" value="Go!"></label>
     </form>
     <h1>Already registered? Use your identicon to login!</h1>
-    <form enctype="multipart/form-data" action="login" method="post">
+    <form enctype="multipart/form-data" action="/login" method="post">
         <label>user name: <input name="name" type="text"></label>
         <br/>
         <label>identicon: <input name="identicon" type="file"></label>
         <br/>
-        <label><input type="button" value="GO!"></label>
+        <label><input type="submit" value="GO!"></label>
     </form>
 </body>
 </html>
