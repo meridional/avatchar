@@ -89,10 +89,13 @@ def find_user(name):
 
 
 def user_said_something(name, content):
-  user = find_user(name)
+  if type(name) != type(''):
+    user = name
+  else:
+    user = find_user(name)
   t = datetime.datetime.utcnow()
   record = msg_collection.insert({"user_id":user.idx, "content":content, "datetime":t})
-  return Message(record._id, t, content, user)
+  return Message(record, t, content, user)
 
 
 

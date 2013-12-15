@@ -5,6 +5,7 @@ import identicon
 import tornado.options
 from tornado.options import define
 import acdb
+import json
 import StringIO
 
 
@@ -81,14 +82,34 @@ class VerificationHandler(tornado.web.RequestHandler):
     self.write('fail')
 
 
+current_user = {}
+
 class RealTimeRocker(tornado.websocket.WebSocketHandler):
+
   def open(self):
-    if verify_login(self):
+    u = verify_login(self)
+    if u:
+      current_user[self] = u
       return
     self.close()
 
   def on_message(self, message):
-    self.write_message(message + u", hello")
+    #print type(message)
+
+    msg = acdb.user_said_something(current_user[self], message)
+    # broadcast
+    for conn in current_user:
+      print type(msg.user.img_url)
+      conn.write_message(
+        {"name":msg.user.name,
+         "img":"/identicon/" + msg.user.name,
+         "msg":message,
+         "datetime":str(msg.datetime)})
+
+
+  def on_close(self):
+    if current_user.has_key(self):
+      del current_user[self]
 
 class SecretHandler(tornado.web.RequestHandler):
   def get(self, name):
