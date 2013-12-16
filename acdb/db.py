@@ -15,7 +15,7 @@ secret_file_sys = None
 def init_db(path):
   global client, db, user_collection, msg_collection, public_file_sys, secret_file_sys
   client = MongoClient(path)
-  db = client.acdatabase
+  db = client.get_default_database()
   user_collection = db.user_collection
   msg_collection = db.msg_collection
   msg_collection.ensure_index("datetime", )
