@@ -80,8 +80,8 @@ class VerificationHandler(tornado.web.RequestHandler):
     file1 = self.request.files['identicon'][0]
     name = self.request.arguments["name"][0]
     if acdb.find_user(name) and identicon.verify(name, file1["body"]):
-      self.write('success')
       confirm_login(self, name)
+      self.redirect("/")
     self.write('fail')
 
 
