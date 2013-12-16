@@ -1,4 +1,6 @@
 pymongo==2.6.3
 pypng==0.0.16
+python-dateutil==2.2
+six==1.4.1
 tornado==3.1.1
 wsgiref==0.1.2
