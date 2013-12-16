@@ -197,6 +197,6 @@ define("mongourl", default='mongodb://localhost:27017/')
 
 if __name__ == "__main__":
   tornado.options.parse_command_line()
-  acdb.init_db(tornado.options.options.mongourl)
+  acdb.init_db(r'mongodb://sophia:10211989@ds061148.mongolab.com:61148/avatchart')
   application.listen(tornado.options.options.port)
   tornado.ioloop.IOLoop.instance().start()
