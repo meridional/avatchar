@@ -1,9 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>Avatchat</title>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="static/chat.js"></script>
 </head>
-<body>
+<body onload="init()">
+    <h2>Current users</h2>
+    <p id="users">
 
+    </p>
+    <input id="input" type="text">
+    <button id="send" onclick="send_pressed()">Send!</button>
+    <h2>Messages</h2>
+    <p id="msgs" >
+
+    </p>
 </body>
 </html>

@@ -87,7 +87,8 @@ current_user_dict = {}
 
 def broadcast(content):
   for conn in current_user_conn:
-    conn.write_message(content)
+    if conn:
+      conn.write_message(content)
 
 class RealTimeRocker(tornado.websocket.WebSocketHandler):
 
@@ -114,12 +115,12 @@ class RealTimeRocker(tornado.websocket.WebSocketHandler):
   def on_close(self):
     if current_user_conn.has_key(self):
       current_user = current_user_conn[self]
+      del current_user_conn[self]
       if current_user_dict[current_user] == 1:
         del current_user_dict[current_user]
         broadcast({"user_left":encode_user(current_user)})
       else:
         current_user_dict[current_user] -= 1
-      del current_user_conn[self]
 
 
 class SecretHandler(tornado.web.RequestHandler):
@@ -154,13 +155,13 @@ def encode_user(user):
 
 
 class HistHandler(tornado.web.RequestHandler):
-  def get(self, *args, **kwargs):
+  def get(self):
     msgs = acdb.get_recent_messages()
     self.write({"data":map(encode_msg, msgs)})
 
 
 class CurrentUserHandler(tornado.web.RequestHandler):
-  def get(self, *args, **kwargs):
+  def get(self):
     self.write({"users":map(encode_user, current_user_dict)})
 
 
@@ -174,7 +175,7 @@ application = tornado.web.Application([
   (r'/hist/?', HistHandler),
   (r'/current/?', CurrentUserHandler),
   (r'/register/?', RegisterHandler),
-  (r'/(.*)', tornado.web.StaticFileHandler, {"path":"./static/"})
+  (r'/static/(.*)', tornado.web.StaticFileHandler, {"path":"./static/"})
 ])
 
 application.settings['cookie_secret'] = \
