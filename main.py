@@ -5,6 +5,17 @@ import identicon
 import tornado.options
 from tornado.options import define
 import acdb
+
+from dateutil import tz
+import calendar
+from datetime import datetime, timedelta
+
+def utc_to_local(utc_dt):
+    # get integer timestamp to avoid precision lost
+    timestamp = calendar.timegm(utc_dt.timetuple())
+    local_dt = datetime.fromtimestamp(timestamp)
+    assert utc_dt.resolution >= timedelta(microseconds=1)
+    return local_dt.replace(microsecond=utc_dt.microsecond)
 import json
 import StringIO
 
@@ -141,13 +152,15 @@ class SecretHandler(tornado.web.RequestHandler):
       self.redirect(r'/identicon/' + name)
 
 
+to_zone = tz.gettz('America/New_York')
+
 def encode_msg(msg):
   # takes a Message object
   return {
          "name":msg.user.name,
          "img":"/identicon/" + msg.user.name,
          "msg":msg.text,
-         "datetime":str(msg.datetime)}
+         "datetime":(utc_to_local(msg.datetime).strftime("%x %X"))}
 
 
 def encode_user(user):

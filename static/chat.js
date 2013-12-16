@@ -19,6 +19,7 @@ function received_msg(msg) {
     img.src = msg["img"];
     imgSpan.appendChild(img);
     var user_tag = document.createElement("span");
+    var time = new Date(msg["datetime"]);
     user_tag.innerHTML = (msg["datetime"] + ", " + escape(msg["name"]) + ": " + msg["msg"]);
     newDiv.appendChild(imgSpan);
     newDiv.appendChild(user_tag);
@@ -46,7 +47,7 @@ function user_joined(user) {
     img.src = user["img"];
     var imgSpan = document.createElement("span");
     imgSpan.appendChild(img);
-    var namediv = document.createElement("div");
+    var namediv = document.createElement("span");
     namediv.innerHTML = escape(user["name"]);
     userDiv.appendChild(imgSpan);
     userDiv.appendChild(namediv);

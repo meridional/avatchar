@@ -2,24 +2,59 @@
 <html>
 <head>
     <title>Avatchat</title>
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <link rel="stylesheet" href="static/foundation.css">
+    <link rel="stylesheet" href="static/normalize.css">
     <script src="static/chat.js"></script>
+    <style>
+
+    </style>
 </head>
 <body onload="init()">
     {% block user %}
-    <h2>Logged in as {{ user.name }}</h2>
-    <img src={{ "/secret/" + user.name }}/>
+    <div class="row">
+        <div class="small-2 large-centered columns" >
+            <h1>
+                Avatchat
+            </h1>
+        </div>
+
+    </div>
+
     {% end %}
-    <a href="/logout">Logout</a>
-    <h2>Current users</h2>
+    <div class="row">
+    <div id="left" class="small-2 large-4 columns panel" >
+        <div>
+            <div>
+                <h4>
+                Logged in as </h4> <br/>
+                <h4>
+                    <a class="th" href="{{ "/secret/" + user.name }}">
+                        <img src="{{ "/identicon/" + user.name }}"/>
+                    </a>
+                    {{ user.name }}
+
+                 </h4>
+                <a href="/logout" class="button">Logout</a>
+
+            </div>
+        </div>
+    <h3>Current users</h3>
     <p id="users">
 
     </p>
-    <label>Type message here: <input id="input" type="text"></label>
-    <button id="send" onclick="send_pressed()">Send!</button>
-    <h2>Past Messages</h2>
-    <p id="msgs" >
+    </div>
 
-    </p>
+    <div id="right" class="small-2 large-8 columns panel" >
+        <label>Your awesome thoughts:
+            <input id="input" type="text" placeholder="type here">
+        </label>
+        <button id="send" onclick="send_pressed()">Send!</button>
+        <h3>Past Messages</h3>
+        <p id="msgs" >
+
+
+        </p>
+    </div>
+    </div>
 </body>
 </html>
