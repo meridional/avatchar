@@ -82,9 +82,12 @@ def insert_user(name):
 
 def get_identicon_for_user_name(name, auth = False):
   u = find_user(name)
-  if auth:
-    return secret_file_sys.get(u.secret_url)
-  return public_file_sys.get(u.img_url)
+  if u:
+    if auth:
+      return secret_file_sys.get(u.secret_url)
+    return public_file_sys.get(u.img_url)
+  else:
+    return None
 
 
 def find_user(name):
