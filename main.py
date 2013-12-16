@@ -42,7 +42,9 @@ class RegisterHandler(tornado.web.RequestHandler):
       return
     name = self.request.arguments["name"][0]
     if acdb.find_user(name):
-      self.redirect("/")
+      self.write("Name already exists. ")
+      self.write("<a href='/'>Click me to go back</a>")
+      #self.redirect("/")
     else:
       confirm_login(self, name)
       user = acdb.insert_user(name)
@@ -53,12 +55,13 @@ class RegisterHandler(tornado.web.RequestHandler):
 class MainHandler(tornado.web.RequestHandler):
 
   def get(self):
-    if not verify_login(self):
+    user = verify_login(self)
+    if not user:
       #self.set_cookie(name_cookie_key, "harry")
       #self.set_secure_cookie(id_cookie_key, "harry")
       self.render("./static/register.html")
     else:
-      self.render("./static/chat.html")
+      self.render("./static/chat.html", user = user)
 
 
 class IdenticonHandler(tornado.web.RequestHandler):
@@ -165,6 +168,11 @@ class CurrentUserHandler(tornado.web.RequestHandler):
     self.write({"users":map(encode_user, current_user_dict)})
 
 
+class LogOutHandler(tornado.web.RequestHandler):
+  def get(self):
+    self.clear_all_cookies()
+    self.redirect('/')
+
 # routes
 application = tornado.web.Application([
   (r"/", MainHandler),
@@ -175,6 +183,7 @@ application = tornado.web.Application([
   (r'/hist/?', HistHandler),
   (r'/current/?', CurrentUserHandler),
   (r'/register/?', RegisterHandler),
+  (r'/logout/?', LogOutHandler),
   (r'/static/(.*)', tornado.web.StaticFileHandler, {"path":"./static/"})
 ])
 
