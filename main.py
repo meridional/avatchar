@@ -81,8 +81,13 @@ class IdenticonHandler(tornado.web.RequestHandler):
       name = name[0:-1]
     #buffer.close()
     #self.clear()
-    self.write(acdb.get_identicon_for_user_name(name, auth=False).read(9999))
-    self.set_header('Content-Type', 'image/png')
+    img = acdb.get_identicon_for_user_name(name, auth=False)
+    if img:
+      self.write(img.read(9999))
+      self.set_header('Cache-Control','no-transform,public,max-age=300,s-maxage=900')
+      self.set_header('Content-Type', 'image/png')
+    else:
+      self.set_status(404)
     #self.finish()
 
 
@@ -205,11 +210,11 @@ application.settings['cookie_secret'] = \
 
 
 define("port", default=8888, help="run on given port", type=int)
-define("mongourl", default='mongodb://localhost:27017/')
+define("mongourl", default='mongodb://localhost:27017/acdatabase')
 
 
 if __name__ == "__main__":
   tornado.options.parse_command_line()
-  acdb.init_db(r'mongodb://sophia:10211989@ds061148.mongolab.com:61148/avatchart')
+  acdb.init_db(tornado.options.options.mongourl)
   application.listen(tornado.options.options.port)
   tornado.ioloop.IOLoop.instance().start()
