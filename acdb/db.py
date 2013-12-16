@@ -18,7 +18,7 @@ def init_db(path):
   db = client.acdatabase
   user_collection = db.user_collection
   msg_collection = db.msg_collection
-  msg_collection.ensure_index("datetime")
+  #msg_collection.ensure_index("datetime", )
   public_file_sys = gridfs.GridFS(db, 'pf')
   secret_file_sys = gridfs.GridFS(db, 'sf')
 
