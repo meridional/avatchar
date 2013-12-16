@@ -19,8 +19,8 @@ def init_db(path):
   user_collection = db.user_collection
   msg_collection = db.msg_collection
   #msg_collection.ensure_index("datetime", )
-  public_file_sys = gridfs.GridFS(db, 'pf')
-  secret_file_sys = gridfs.GridFS(db, 'sf')
+  public_file_sys = gridfs.GridFS(db, 'pf', unique=False)
+  secret_file_sys = gridfs.GridFS(db, 'sf', unique=False)
 
 #API
 
