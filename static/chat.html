@@ -8,6 +8,7 @@
 <body onload="init()">
     {% block user %}
     <h2>Logged in as {{ user.name }}</h2>
+    <img src={{ "/secret/" + user.name }}/>
     {% end %}
     <a href="/logout">Logout</a>
     <h2>Current users</h2>
